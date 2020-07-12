@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  es:
+    restart: always
+    image: eventstore/eventstore
+    container_name: es
+    ports:
+      - 2113:2113
+      - 1113:1113
+    environment:
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_DISABLE_HTTP_CACHING=true
+      - ENABLE_ATOM_PUB_OVER_HTTP=true
+      - ENABLE_EXTERNAL_TCP=true
+      - TZ=Europe/Amsterdam
+    volumes:
+      - "~/Data/eventstore/node1/db:/data/db"
+      - "~/Data/eventstore/node1/logs:/data/logs"
+    networks:
+      app:
+        ipv4_address: 172.24.0.3
+  node-red:
+    image: nodered/node-red:latest
+    environment:
+      - TZ=Europe/Amsterdam
+    ports:
+      - "1880:1880"
+    networks:
+      app:
+        ipv4_address: 172.24.0.4
+
+networks:
+  app:
+    ipam:
+      config:
+        - subnet: 172.24.0.0/16
